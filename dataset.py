@@ -15,7 +15,7 @@ class DocDataset(Dataset):
              no_below=5, no_above=0.1, hasLabel=False, rebuild=False, use_tfidf=False):
 
         # Xác định thư mục dữ liệu
-        self.base_dir = "/content/Neural_Topic_Models/data"  
+        self.base_dir = "/content/InsightFlow-Neural-Topic-Modeling-for-Intelligent-Summaries/data"  
         os.makedirs(self.base_dir, exist_ok=True)
 
         # Xác định đường dẫn tệp dữ liệu
