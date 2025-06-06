@@ -8,6 +8,7 @@ from models import BATM
 from utils import *
 from dataset import DocDataset
 from multiprocessing import cpu_count
+from models.BATM import BATM
 
 # Dùng biến thay vì argparse để chạy trên Colab
 class Args:
