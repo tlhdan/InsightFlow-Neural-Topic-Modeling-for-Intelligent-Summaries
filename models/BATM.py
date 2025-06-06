@@ -8,7 +8,7 @@ from torch.utils.data import Dataset, DataLoader
 import numpy as np
 from tqdm import tqdm
 import matplotlib.pyplot as plt
-from .gan import Generator, Encoder, Discriminator
+from gan import Generator, Encoder, Discriminator
 import sys
 sys.path.append('..')
 from utils import evaluate_topic_quality, smooth_curve
