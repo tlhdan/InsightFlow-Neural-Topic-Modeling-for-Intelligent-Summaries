@@ -1,4 +1,5 @@
 import os
+import re
 import numpy as np
 import gensim
 import pickle
@@ -10,29 +11,35 @@ from gensim.models import TfidfModel
 from collections import Counter
 from tokenization import *
 
-class DocDataset(Dataset):
-    def __init__(self, taskname, txtPath=None, lang="zh", tokenizer=None, stopwords=None,
-             no_below=5, no_above=0.1, hasLabel=False, rebuild=False, use_tfidf=False):
+def clean_text(text, lang="vi"):
+    text = text.lower()
+    # Loại bỏ số và ký tự đặc biệt (giữ _)
+    text = re.sub(r'[0-9!"#$%&\'()*+,-./:;<=>?@—，。：★、￥…【】（）《》？“”‘’！\[\\\]^`{|}~\u3000]+', ' ', text)
+    # Loại bỏ tên riêng nước ngoài hoặc từ nhiễu
+    text = re.sub(r'\b(carlos|hc|xiv|kashmir|sinner|duterte|francis|philippines|vatican)\b', '', text, flags=re.IGNORECASE)
+    # Loại bỏ khoảng trắng thừa
+    text = ' '.join(text.split())
+    return text
 
-        # Xác định thư mục dữ liệu
-        self.base_dir = "/content/InsightFlow-Neural-Topic-Modeling-for-Intelligent-Summaries/data"  
+class DocDataset(Dataset):
+    def __init__(self, taskname, txtPath=None, lang="vi", tokenizer=None, stopwords=None,
+                 no_below=5, no_above=0.3, hasLabel=False, rebuild=False, use_tfidf=False):
+        self.base_dir = "/content/Neural_Topic_Models/data"
         os.makedirs(self.base_dir, exist_ok=True)
 
-        # Xác định đường dẫn tệp dữ liệu
         if txtPath is None:
-            txtPath = os.path.join(self.base_dir, f'{taskname}_lines.txt')
+            txtPath = os.path.join(self.base_dir, f'{taskname}.txt')
 
         tmpDir = os.path.join(self.base_dir, taskname)
 
-        # Kiểm tra xem file có tồn tại không
         if not os.path.exists(txtPath):
             raise FileNotFoundError(f"❌ Không tìm thấy tệp: {txtPath}. Hãy kiểm tra đường dẫn!")
 
         print(f"📂 Đang mở tệp: {txtPath}")
 
-        # Đọc dữ liệu từ tệp
+        # Đọc và làm sạch dữ liệu
         with open(txtPath, 'r', encoding='utf-8') as f:
-            self.txtLines = [line.strip() for line in f]
+            self.txtLines = [clean_text(line.strip(), lang) for line in f if line.strip()]
 
         self.dictionary = None
         self.bows, self.docs = None, None
@@ -121,27 +128,3 @@ class DocDataset(Dataset):
         ndoc = len(self.docs)
         dfs_topk = self.show_dfs_topk(topk=topk)
         return 1.0*dfs_topk[-1][-1]/ndoc
-if __name__ == '__main__':
-    # dataset = DocDataset('EMNLP2020', rebuild=True)
-    # dataloader = DataLoader(dataset, batch_size=64, shuffle=True, num_workers=0, collate_fn=dataset.collate_fn)
-    # data_iterator = iter(dataloader)
-    # print(next(data_iterator))
-    # print('Top 20 frequent words:')
-    # dataset.show_dfs_topk()
-
-    docSet = DocDataset('EMNLP2020',rebuild=True)
-    dataloader = DataLoader(docSet,batch_size=64,shuffle=True ,num_workers=2,collate_fn=docSet.collate_fn)
-    print('docSet.docs[10]:',docSet.docs[10])
-    print(iter)
-    # del iter
-    print(next(iter(dataloader)))
-    print('The top 20 tokens in document frequency:')
-    docSet.show_dfs_topk()
-    print('The top 20 tokens in collections frequency:')
-    input("Press any key ...")
-    # docSet.show_cfs_topk()
-    # input("Press any key ...")
-    for doc in docSet:
-        print(doc)
-        break
-    print(docSet.topk_dfs(20))

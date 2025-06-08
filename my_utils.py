@@ -31,7 +31,7 @@ def calc_topic_coherence(topic_words,docs,dictionary,emb_path=None,taskname=None
     cv_coherence_model = CoherenceModel(topics=topic_words,texts=docs,dictionary=dictionary,coherence='c_v')
     cv_per_topic = cv_coherence_model.get_coherence_per_topic() if calc4each else None
     cv_score = cv_coherence_model.get_coherence()
-    
+
     # Computing the C_W2V score
     try:
         w2v_model_path = os.path.join(os.getcwd(),'data',f'{taskname}','w2v_weight_kv.txt')
@@ -42,12 +42,12 @@ def calc_topic_coherence(topic_words,docs,dictionary,emb_path=None,taskname=None
             keyed_vectors = gensim.models.KeyedVectors.load_word2vec_format(w2v_model_path,binary=False)
         elif sents4emb!=None:
             print('Training a word2vec model 20 epochs to evaluate topic coherence, this may take a few minutes ...')
-            w2v_model = gensim.models.Word2Vec(sents4emb,size=300,min_count=1,workers=6,iter=20)
+            w2v_model = gensim.models.Word2Vec(sents4emb,vector_size=300,min_count=1,workers=6,iter=20)
             keyed_vectors = w2v_model.wv
             keyed_vectors.save_word2vec_format(w2v_model_path,binary=False)
         else:
             raise Exception("C_w2v score isn't available for the missing of training corpus (sents4emb=None).")
-            
+
         w2v_coherence_model = CoherenceModel(topics=topic_words,texts=docs,dictionary=dictionary,coherence='c_w2v',keyed_vectors=keyed_vectors)
 
         w2v_per_topic = w2v_coherence_model.get_coherence_per_topic() if calc4each else None
@@ -57,13 +57,13 @@ def calc_topic_coherence(topic_words,docs,dictionary,emb_path=None,taskname=None
         #In case of OOV Error
         w2v_per_topic = [None for _ in range(len(topic_words))]
         w2v_score = None
-    
+
     # Computing the C_UCI score
     c_uci_coherence_model = CoherenceModel(topics=topic_words,texts=docs,dictionary=dictionary,coherence='c_uci')
     c_uci_per_topic = c_uci_coherence_model.get_coherence_per_topic() if calc4each else None
     c_uci_score = c_uci_coherence_model.get_coherence()
-    
-    
+
+
     # Computing the C_NPMI score
     c_npmi_coherence_model = CoherenceModel(topics=topic_words,texts=docs,dictionary=dictionary,coherence='c_npmi')
     c_npmi_per_topic = c_npmi_coherence_model.get_coherence_per_topic() if calc4each else None
@@ -90,10 +90,10 @@ def mimno_topic_coherence(topic_words,docs):
     return np.mean(s)
 
 def evaluate_topic_quality(topic_words, test_data, taskname=None, calc4each=False):
-    
+
     td_score = calc_topic_diversity(topic_words)
     print(f'topic diversity:{td_score}')
-    
+
     (c_v, c_w2v, c_uci, c_npmi),\
         (cv_per_topic, c_w2v_per_topic, c_uci_per_topic, c_npmi_per_topic) = \
         calc_topic_coherence(topic_words=topic_words, docs=test_data.docs, dictionary=test_data.dictionary,
@@ -106,7 +106,7 @@ def evaluate_topic_quality(topic_words, test_data, taskname=None, calc4each=Fals
             print(f'{scr_name}:')
             for t_idx, (score, twords) in enumerate(zip(scr_per_topic, topic_words)):
                 print(f'topic.{t_idx+1:>03d}: {score} {twords}')
-    
+
     mimno_tc = mimno_topic_coherence(topic_words, test_data.docs)
     print('mimno topic coherence:{}'.format(mimno_tc))
     if calc4each:
