@@ -5,7 +5,7 @@ import pickle
 import logging
 import time
 from models import BATM
-from utils import *
+from my_utils import *
 from dataset import DocDataset
 from multiprocessing import cpu_count
 from models.BATM import BATM

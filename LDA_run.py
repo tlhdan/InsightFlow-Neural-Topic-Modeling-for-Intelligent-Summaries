@@ -8,7 +8,7 @@ import pickle
 import argparse
 import logging
 import time
-from utils import *
+from my_utils import *
 from gensim.models import LdaModel,TfidfModel
 from gensim.models.ldamulticore import LdaMulticore
 from gensim.models.coherencemodel import CoherenceModel

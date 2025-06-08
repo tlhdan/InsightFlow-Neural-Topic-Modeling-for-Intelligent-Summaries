@@ -4,7 +4,7 @@ import torch
 import argparse
 import time
 from models import BATM, ETM, GMNTM, GSM, WTM
-from utils import *
+from my_utils import *
 from dataset import TestData
 from multiprocessing import cpu_count
 import numpy as np
