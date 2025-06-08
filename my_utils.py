@@ -42,7 +42,7 @@ def calc_topic_coherence(topic_words,docs,dictionary,emb_path=None,taskname=None
             keyed_vectors = gensim.models.KeyedVectors.load_word2vec_format(w2v_model_path,binary=False)
         elif sents4emb!=None:
             print('Training a word2vec model 20 epochs to evaluate topic coherence, this may take a few minutes ...')
-            w2v_model = gensim.models.Word2Vec(sents4emb,vector_size=300,min_count=1,workers=6,iter=20)
+            w2v_model = gensim.models.Word2Vec(sents4emb,vector_size=300,min_count=1,workers=6,epochs=20)
             keyed_vectors = w2v_model.wv
             keyed_vectors.save_word2vec_format(w2v_model_path,binary=False)
         else:
